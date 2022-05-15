@@ -1,4 +1,4 @@
-import {Component, OnInit, Renderer2} from '@angular/core';
+import {Component, ElementRef, OnInit, Renderer2} from '@angular/core';
 import {DomSanitizer, SafeResourceUrl} from "@angular/platform-browser";
 import {FormBuilder, Validators} from "@angular/forms";
 
@@ -19,6 +19,7 @@ export class AppComponent implements OnInit {
 
   constructor(
     private renderer: Renderer2,
+    private elementRef: ElementRef,
     private sanitizer: DomSanitizer,
     private fb: FormBuilder
   ) {
@@ -38,7 +39,6 @@ export class AppComponent implements OnInit {
   }
 
   onDownload() {
-    console.log('Image', this.base64Blob)
     const byteString = window.atob(this.base64Blob.split(',')[1]);
     const arrayBuffer = new ArrayBuffer(byteString.length);
     const int8Array = new Uint8Array(arrayBuffer);
@@ -47,13 +47,13 @@ export class AppComponent implements OnInit {
     }
     const blob = new Blob([int8Array], {type: 'image/gif'});
     const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a')
+    let a = this.renderer.createElement('a');
     a.href = url
-    // @ts-ignore
-    a.download = url.split('/').pop()
-    document.body.appendChild(a)
+    // a.download = url.split('/').pop()
+    a.download = "gif-filename";
+    this.renderer.appendChild(this.elementRef.nativeElement,a);
     a.click()
-    document.body.removeChild(a)
+    this.renderer.removeChild(this.elementRef.nativeElement, a)
   }
 }
 
